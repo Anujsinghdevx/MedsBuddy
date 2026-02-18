@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
