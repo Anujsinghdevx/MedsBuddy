@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { markMedicationTaken } from "@/lib/api/medication-logs"
+import { MedicationLogWithMedications } from "@/types/supabase"
 
 interface MedicationCardProps {
-  log: any
+  log: MedicationLogWithMedications
 }
 
 export function MedicationCard({ log }: MedicationCardProps) {
@@ -45,9 +46,9 @@ export function MedicationCard({ log }: MedicationCardProps) {
       queryClient.invalidateQueries({ queryKey: ["medication-logs"] })
     },
 
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || "Failed to mark as taken")
-      setStatus(log.status) 
+      setStatus(log.status ?? "pending") 
     },
   })
 
@@ -140,16 +141,7 @@ export function MedicationCard({ log }: MedicationCardProps) {
         </div>
       )}
 
-      {log.proof_url && (
-        <div className="mt-2">
-          <p className="text-sm text-muted-foreground">Uploaded Proof:</p>
-          <img
-            src={log.proof_url}
-            alt="Proof"
-            className="mt-1 w-24 h-24 object-cover rounded border"
-          />
-        </div>
-      )}
+      {/* Proof image functionality can be added here when implemented */}
     </div>
   )
 }

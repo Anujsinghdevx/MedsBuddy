@@ -1,9 +1,10 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { MedicationLogWithMedications } from "@/types/supabase"
 
 interface MedicationCalendarProps {
-  logs: any[]
+  logs: MedicationLogWithMedications[]
 }
 
 export function MedicationCalendar({ logs }: MedicationCalendarProps) {
@@ -11,7 +12,7 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
   const year = now.getFullYear()
   const month = now.getMonth()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const logsMap: Record<string, any[]> = {}
+  const logsMap: Record<string, MedicationLogWithMedications[]> = {}
 
   logs.forEach((log) => {
     const dateStr = log.scheduled_for
@@ -19,7 +20,7 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
     logsMap[dateStr].push(log)
   })
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case "taken":
         return "bg-green-500"
@@ -60,11 +61,11 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
                 title={
                   dayLogs.length > 0
                     ? dayLogs
-                      .map(
-                        (log) =>
-                          `${log.medications.name}: ${log.status}`
-                      )
-                      .join("\n")
+                        .map(
+                          (log) =>
+                            `${log.medications?.name || "Unknown"}: ${log.status || "pending"}`
+                        )
+                        .join("\n")
                     : "No medications scheduled"
                 }
               >

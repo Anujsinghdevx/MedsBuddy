@@ -1,10 +1,15 @@
 import { MedicationCard } from "./MedicationCard"
+import { MedicationLogWithMedications } from "@/types/supabase"
 
-export function TodayMedications({ logs }: any) {
+interface TodayMedicationsProps {
+  logs: MedicationLogWithMedications[]
+}
+
+export function TodayMedications({ logs }: TodayMedicationsProps) {
   const today = new Date().toISOString().split("T")[0]
 
   const todayLogs = logs.filter(
-    (log: any) => log.scheduled_for === today
+    (log: MedicationLogWithMedications) => log.scheduled_for === today
   )
 
   return (
@@ -19,7 +24,7 @@ export function TodayMedications({ logs }: any) {
         </p>
       )}
 
-      {todayLogs.map((log: any) => (
+      {todayLogs.map((log: MedicationLogWithMedications) => (
         <MedicationCard key={log.id} log={log} />
       ))}
     </div>

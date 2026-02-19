@@ -65,7 +65,7 @@ export default function CaretakerAddMedicationForm() {
       queryClient.invalidateQueries({ queryKey: ["medications"] })
       reset()
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error?.message || "Failed to add medication")
     },
   })

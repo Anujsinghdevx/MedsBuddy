@@ -7,10 +7,11 @@ import { StatsGrid } from "./StatsGrid"
 import { TodayMedications } from "./TodayMedications"
 import { MedicationCalendar } from "./MedicationCalendar"
 import { calculateStats } from "@/lib/utils"
+import { MedicationLogWithMedications } from "@/types/supabase"
 
 export function PatientView() {
   const supabase = createClient()
-  const [logs, setLogs] = useState<any[]>([])
+  const [logs, setLogs] = useState<MedicationLogWithMedications[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

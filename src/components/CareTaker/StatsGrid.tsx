@@ -1,6 +1,11 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { CaretakerStats } from "@/types/supabase"
 
-export function StatsGrid({ stats }: any) {
+interface StatsGridProps {
+  stats: CaretakerStats
+}
+
+export function StatsGrid({ stats }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <StatCard title="Adherence Rate" value={`${stats.adherenceRate}%`} />
@@ -11,7 +16,12 @@ export function StatsGrid({ stats }: any) {
   )
 }
 
-function StatCard({ title, value }: any) {
+interface StatCardProps {
+  title: string
+  value: string | number
+}
+
+function StatCard({ title, value }: StatCardProps) {
   return (
     <Card>
       <CardHeader>

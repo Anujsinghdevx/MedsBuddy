@@ -7,6 +7,7 @@ import MedicationCard from "./medication-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSupabase } from "@/providers/supabase-provider"
 import { useEffect, useState } from "react"
+import { MedicationLogWithMedications, Medication } from "@/types/supabase"
 
 export default function MedicationList() {
   const today = new Date().toISOString().split("T")[0]
@@ -50,10 +51,14 @@ export default function MedicationList() {
 
   return (
     <div className="space-y-4">
-      {medications.map((med) => {
+      {medications.map((med: Medication) => {
         const log = logs?.find(
-          (l) => l.medication_id === med.id
+          (l: MedicationLogWithMedications) => l.medication_id === med.id
         )
+
+        if (!log) {
+          return null
+        }
 
         return (
           <MedicationCard

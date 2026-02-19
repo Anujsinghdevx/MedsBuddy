@@ -9,10 +9,11 @@ import { QuickActions } from "./QuickActions"
 import { CalendarOverview } from "./CalendarOverview"
 import { calculateCaretakerStats } from "@/lib/utils"
 import CaretakerAddMedicationForm from "./CaretakerAddMedication"
+import { MedicationLogWithUser } from "@/types/supabase"
 
 export function CaretakerView() {
   const supabase = createClient()
-  const [logs, setLogs] = useState<any[]>([])
+  const [logs, setLogs] = useState<MedicationLogWithUser[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

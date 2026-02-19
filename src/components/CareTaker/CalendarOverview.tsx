@@ -1,9 +1,10 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { MedicationLogWithMedications } from "@/types/supabase"
 
 interface CalendarOverviewProps {
-  logs: any[]
+  logs: MedicationLogWithMedications[]
 }
 
 export function CalendarOverview({ logs }: CalendarOverviewProps) {
@@ -11,14 +12,14 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
   const year = now.getFullYear()
   const month = now.getMonth()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const logsMap: Record<string, any[]> = {}
+  const logsMap: Record<string, MedicationLogWithMedications[]> = {}
   logs.forEach((log) => {
     const dateStr = log.scheduled_for
     if (!logsMap[dateStr]) logsMap[dateStr] = []
     logsMap[dateStr].push(log)
   })
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case "taken":
         return "bg-green-500"
@@ -62,7 +63,7 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
                     ? dayLogs
                         .map(
                           (log) =>
-                            `${log.user?.name || "User"}: ${log.medications.name} - ${log.status}`
+                            `${log.medications?.name || "Unknown"} - ${log.status || "pending"}`
                         )
                         .join("\n")
                     : "No medications scheduled"
@@ -74,7 +75,7 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
                     <span
                       key={idx}
                       className={`w-2 h-2 rounded-full ${getStatusColor(
-                        log.status
+                        log.status || "pending"
                       )}`}
                     ></span>
                   ))}

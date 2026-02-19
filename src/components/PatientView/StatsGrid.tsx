@@ -4,8 +4,13 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card"
+import { MedicationStats } from "@/types/supabase"
 
-export function StatsGrid({ stats }: any) {
+interface StatsGridProps {
+  stats: MedicationStats
+}
+
+export function StatsGrid({ stats }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <StatCard title="Day Streak" value={stats.streak} />
@@ -15,7 +20,12 @@ export function StatsGrid({ stats }: any) {
   )
 }
 
-function StatCard({ title, value }: any) {
+interface StatCardProps {
+  title: string
+  value: string | number
+}
+
+function StatCard({ title, value }: StatCardProps) {
   return (
     <Card>
       <CardHeader>

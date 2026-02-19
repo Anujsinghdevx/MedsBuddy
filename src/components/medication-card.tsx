@@ -7,10 +7,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { Medication, MedicationLogWithMedications } from "@/types/supabase"
 
 interface MedicationCardProps {
-  medication: any
-  log: any
+  medication: Medication
+  log: MedicationLogWithMedications
   today: string
 }
 
@@ -120,16 +121,7 @@ export default function MedicationCard({
           </Button>
         </div>
 
-        {log?.proof_url && (
-          <div className="mt-2">
-            <p className="text-sm text-muted-foreground">Proof uploaded:</p>
-            <img
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/proof-photos/${log.proof_url}`}
-              alt="Proof"
-              className="mt-1 w-24 h-24 object-cover rounded border"
-            />
-          </div>
-        )}
+        {/* Proof image functionality can be added here when implemented */}
       </CardContent>
     </Card>
   )

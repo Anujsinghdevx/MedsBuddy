@@ -1,11 +1,12 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MedicationLog, MedicationStats, CaretakerStats } from "@/types/supabase"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function calculateStats(logs: any[]) {
+export function calculateStats(logs: MedicationLog[]): MedicationStats {
   const today = new Date().toISOString().split("T")[0]
 
   const todayLogs = logs.filter(
@@ -60,7 +61,7 @@ export function calculateStats(logs: any[]) {
   }
 }
 
-export function calculateCaretakerStats(logs: any[]) {
+export function calculateCaretakerStats(logs: MedicationLog[]): CaretakerStats {
   const now = new Date()
   const month = now.getMonth()
   const year = now.getFullYear()
