@@ -3,7 +3,7 @@
     "crons": [
         {
             "path": "/api/check_pending_medications",
-            "schedule": "0 * * * *"
+            "schedule": "0 0 * * *"
         }
     ]
 }
