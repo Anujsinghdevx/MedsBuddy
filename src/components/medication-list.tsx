@@ -1,85 +1,67 @@
 "use client"
 
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { fetchMedications, deleteMedication } from "@/lib/api/medications"
-import { fetchLogsByDate, markMedicationTaken } from "@/lib/api/medication-logs"
-import { createClient } from "@/lib/supabase/client"
+import { useQuery } from "@tanstack/react-query"
+import { fetchMedications } from "@/lib/api/medications"
+import { fetchLogsByDate } from "@/lib/api/medication-logs"
+import MedicationCard from "./medication-card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useSupabase } from "@/providers/supabase-provider"
+import { useEffect, useState } from "react"
 
 export default function MedicationList() {
-  const queryClient = useQueryClient()
-  const supabase = createClient()
-
   const today = new Date().toISOString().split("T")[0]
 
-  // Fetch medications
+  const supabase = useSupabase()
+  const [sessionReady, setSessionReady] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(() => {
+      setSessionReady(true)
+    })
+  }, [supabase])
+
   const { data: medications, isLoading: medsLoading } = useQuery({
     queryKey: ["medications"],
     queryFn: fetchMedications,
+    enabled: sessionReady, 
   })
 
-  // Fetch today's logs
   const { data: logs, isLoading: logsLoading } = useQuery({
     queryKey: ["today-logs", today],
     queryFn: () => fetchLogsByDate(today),
   })
 
-  if (medsLoading || logsLoading) return <p>Loading...</p>
+  if (medsLoading || logsLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-full rounded-lg" />
+        <Skeleton className="h-24 w-full rounded-lg" />
+      </div>
+    )
+  }
+
+  if (!medications?.length) {
+    return (
+      <div className="text-center text-muted-foreground py-10">
+        No medications added yet.
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      {medications?.map((med) => {
+      {medications.map((med) => {
         const log = logs?.find(
           (l) => l.medication_id === med.id
         )
 
         return (
-          <div key={med.id} className="border p-4 rounded">
-            <h3 className="font-bold">{med.name}</h3>
-            <p>Dosage: {med.dosage}</p>
-            <p>Frequency: {med.frequency}</p>
-
-            {/* Status Logic */}
-            {log?.status === "taken" ? (
-              <p className="text-green-600 font-semibold mt-2">
-                Taken Today
-              </p>
-            ) : (
-              <button
-                onClick={async () => {
-                  const {
-                    data: { user },
-                  } = await supabase.auth.getUser()
-
-                  if (!user) return
-
-                  await markMedicationTaken(
-                    med.id,
-                    user.id,
-                    today
-                  )
-
-                  queryClient.invalidateQueries({
-                    queryKey: ["today-logs", today],
-                  })
-                }}
-                className="bg-black text-white px-3 py-1 mt-2"
-              >
-                Mark as Taken
-              </button>
-            )}
-
-            <button
-              onClick={async () => {
-                await deleteMedication(med.id)
-                queryClient.invalidateQueries({
-                  queryKey: ["medications"],
-                })
-              }}
-              className="text-red-500 mt-2 block"
-            >
-              Delete
-            </button>
-          </div>
+          <MedicationCard
+            key={med.id}
+            medication={med}
+            log={log}
+            today={today}
+          />
         )
       })}
     </div>

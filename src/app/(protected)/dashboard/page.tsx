@@ -1,23 +1,33 @@
-import AddMedicationForm from "@/components/add-medication-form"
-import LogoutButton from "@/components/logout-button"
-import MedicationList from "@/components/medication-list"
-import { createClient } from "@/lib/supabase/server"
+"use client"
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
+import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button"
+import { PatientView } from "@/components/PatientView/PatientView"
+import { CaretakerView } from "@/components/CareTaker/CaretakerView"
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export default function DashboardPage() {
+  const [role, setRole] = useState<"patient" | "caretaker">("patient")
+  const supabase = createClient()
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>Welcome, {user?.email}</p>
-      <LogoutButton />
-      <h1 className="text-2xl font-bold">Your Medications</h1>
-      <AddMedicationForm />
-      <MedicationList />
+    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-end space-x-2">
+        <Button
+          variant={role === "patient" ? "default" : "outline"}
+          onClick={() => setRole("patient")}
+        >
+          Patient View
+        </Button>
+        <Button
+          variant={role === "caretaker" ? "default" : "outline"}
+          onClick={() => setRole("caretaker")}
+        >
+          Caretaker View
+        </Button>
+      </div>
+
+      {role === "patient" ? <PatientView /> : <CaretakerView />}
     </div>
   )
 }

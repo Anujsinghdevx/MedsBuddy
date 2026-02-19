@@ -1,58 +1,97 @@
-import type { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
+import sgMail from "@sendgrid/mail";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+type ReminderLog = {
+    id: string;
+    scheduled_at: string;
+    medications: {
+        name: string;
+        dosage: string;
+    }[];
+    users: {
+        email: string | null;
+    }[];
+};
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
 
-  try {
-    const { data: pendingMeds, error } = await supabase
-      .from('medication_logs')
-      .select('id, user_id, scheduled_at, status')
-      .eq('status', 'pending')
-      .lte('scheduled_at', new Date().toISOString()); 
+export async function GET() {
+    try {
+        const supabase = createClient(
+            process.env.SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
 
-    if (error) throw error;
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-    for (const med of pendingMeds || []) {
-      await supabase
-        .from('medication_logs')
-        .update({ status: 'missed' })
-        .eq('id', med.id);
+        const now = new Date();
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
 
-      const { data: user } = await supabase
-        .from('users')
-        .select('full_name, email')
-        .eq('id', med.user_id)
-        .single();
+        const { data, error } = await supabase
+            .from("medication_logs")
+            .select(`
+        id,
+        scheduled_at,
+        medications!inner (
+          name,
+          dosage
+        ),
+        users!inner (
+          email
+        )
+      `)
+            .gte("scheduled_at", startOfToday.toISOString())
+            .lte("scheduled_at", now.toISOString())
+            .eq("status", "pending")
+            .eq("reminder_sent", false);
 
-      if (user) {
-        await supabase.functions.invoke('send-email', {
-          body: JSON.stringify({
-            to: user.email,
-            subject: 'Medication Missed',
-            html: `<p>Hi ${user.full_name},</p>
-                   <p>You missed your scheduled medication at ${med.scheduled_at}.</p>`,
-          }),
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            return NextResponse.json({
+                message: "No reminders to send",
+            });
+        }
+
+        const logs: ReminderLog[] = data;
+
+        for (const log of logs) {
+            const medication = log.medications?.[0];
+            const user = log.users?.[0];
+
+            if (!medication || !user?.email) continue;
+
+            const msg = {
+                to: user.email,
+                from: "anujsingh.devx@gmail.com",
+                subject: "Medication Reminder 💊",
+                text: `Reminder to take ${medication.name} (${medication.dosage})`,
+                html: `
+                      <h2>Medication Reminder 💊</h2>
+                      <p>Please take your medication:</p>
+                      <strong>${medication.name}</strong><br/>
+                      Dosage: ${medication.dosage}
+             `,
+            };
+
+            await sgMail.send(msg);
+
+            await supabase
+                .from("medication_logs")
+                .update({ reminder_sent: true })
+                .eq("id", log.id)
+                .eq("reminder_sent", false);
+        }
+
+        return NextResponse.json({
+            message: `Sent ${logs.length} reminder(s) successfully`,
         });
-      }
-    }
 
-    return new Response(JSON.stringify({ message: 'Processed pending medications' }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+    } catch (err) {
+        console.error("Reminder error:", err);
+        return NextResponse.json(
+            { error: "REMINDER_PROCESS_FAILED" },
+            { status: 500 }
+        );
+    }
 }

@@ -3,6 +3,9 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function LoginPage() {
   const supabase = createClient()
@@ -11,25 +14,37 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
+    if (loading) return
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      setLoading(true)
 
-    if (error) {
-      setError(error.message)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      })
+
+      if (error) {
+        toast.error(error.message)
+        return
+      }
+
+      if (!data.session) {
+        toast.error("Login failed. Please try again.")
+        return
+      }
+
+      toast.success("Welcome back!")
+      router.push("/dashboard")
+
+    } catch {
+      toast.error("Something went wrong. Please try again.")
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.push("/dashboard")
   }
 
   return (
@@ -37,33 +52,29 @@ export default function LoginPage() {
       <form onSubmit={handleLogin} className="space-y-4 w-80">
         <h1 className="text-2xl font-bold">Login</h1>
 
-        <input
+        <Input
           type="email"
           placeholder="Email"
-          className="w-full border p-2"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
-        <input
+        <Input
           type="password"
           placeholder="Password"
-          className="w-full border p-2"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
 
-        {error && <p className="text-red-500">{error}</p>}
-
-        <button
+        <Button
           type="submit"
+          className="w-full"
           disabled={loading}
-          className="w-full bg-black text-white p-2"
         >
-          {loading ? "Loading..." : "Login"}
-        </button>
+          {loading ? "Logging in..." : "Login"}
+        </Button>
       </form>
     </div>
   )

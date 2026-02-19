@@ -3,21 +3,44 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { medicationSchema, MedicationFormValues } from "@/lib/validations/medication"
+import {
+  medicationSchema,
+  MedicationFormValues,
+} from "@/lib/validations/medication"
 import { createMedication } from "@/lib/api/medications"
 import { useSupabase } from "@/providers/supabase-provider"
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
+import { toast } from "sonner"
 
 export default function AddMedicationForm() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<MedicationFormValues>({
+  const form = useForm<MedicationFormValues>({
     resolver: zodResolver(medicationSchema),
+    defaultValues: {
+      name: "",
+      dosage: "",
+      frequency: undefined,
+      time: [],
+    },
   })
 
   const mutation = useMutation({
@@ -30,62 +53,112 @@ export default function AddMedicationForm() {
 
       return createMedication(
         {
-          name: values.name,
-          dosage: values.dosage,
-          frequency: values.frequency,
+          name: values.name.trim(),
+          dosage: values.dosage.trim(),
+          frequency: values.frequency.trim(),
           time: values.time,
         },
-        user.id
       )
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["medications"] })
-      reset()
+      form.reset()
+
+      toast.success("Medication added successfully")
+    },
+
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+
+      toast.error(message)
     },
   })
 
+  function onSubmit(values: MedicationFormValues) {
+    mutation.mutate(values)
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit((data) => mutation.mutate(data))}
-      className="space-y-4 p-4 border rounded"
-    >
-      <input
-        placeholder="Medication Name"
-        {...register("name")}
-        className="w-full border p-2"
-      />
-      {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Add Medication</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Medication Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Paracetamol" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <input
-        placeholder="Dosage"
-        {...register("dosage")}
-        className="w-full border p-2"
-      />
-      {errors.dosage && <p className="text-red-500">{errors.dosage.message}</p>}
+            <FormField
+              control={form.control}
+              name="dosage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dosage</FormLabel>
+                  <FormControl>
+                    <Input placeholder="500mg" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <input
-        placeholder="Frequency (e.g. Daily)"
-        {...register("frequency")}
-        className="w-full border p-2"
-      />
-      {errors.frequency && (
-        <p className="text-red-500">{errors.frequency.message}</p>
-      )}
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Frequency</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Daily" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <input
-        placeholder="Time (e.g. 08:00)"
-        {...register("time.0")}
-        className="w-full border p-2"
-      />
-      {errors.time && <p className="text-red-500">{errors.time.message}</p>}
+            <FormField
+              control={form.control}
+              name="time.0"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input type="time" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <button
-        type="submit"
-        disabled={mutation.isPending}
-        className="bg-black text-white px-4 py-2"
-      >
-        {mutation.isPending ? "Adding..." : "Add Medication"}
-      </button>
-    </form>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "Adding..." : "Add Medication"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }
