@@ -8,29 +8,19 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { createMedication } from "@/lib/api/medications"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  MedicationFormValues,
-  medicationSchema,
-} from "@/lib/validations/medication"
+import { MedicationFormValues, medicationSchema } from "@/lib/validations/medication"
 import { useSupabase } from "@/providers/supabase-provider"
 
 export default function CaretakerAddMedicationForm() {
   const supabase = useSupabase()
   const [userId, setUserId] = useState<string | null>(null)
-
   const queryClient = useQueryClient()
 
   useEffect(() => {
     const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      if (session?.user?.id) {
-        setUserId(session.user.id)
-      }
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user?.id) setUserId(session.user.id)
     }
-
     getSession()
   }, [supabase])
 
@@ -42,22 +32,14 @@ export default function CaretakerAddMedicationForm() {
     formState: { errors },
   } = useForm<MedicationFormValues>({
     resolver: zodResolver(medicationSchema),
-    defaultValues: {
-      frequency: "daily",
-      frequency_per_day: 1,
-      duration_days: 1,
-      time: [""],
-    },
+    defaultValues: { frequency: "daily", frequency_per_day: 1, duration_days: 1, time: [""] },
   })
 
   const frequencyPerDay = watch("frequency_per_day") || 1
 
   const mutation = useMutation({
     mutationFn: async (values: MedicationFormValues) => {
-      if (!userId) {
-        throw new Error("User not authenticated")
-      }
-
+      if (!userId) throw new Error("User not authenticated")
       return createMedication(values)
     },
     onSuccess: () => {
@@ -65,123 +47,66 @@ export default function CaretakerAddMedicationForm() {
       queryClient.invalidateQueries({ queryKey: ["medications"] })
       reset()
     },
-    onError: (error: Error) => {
-      toast.error(error?.message || "Failed to add medication")
-    },
+    onError: (error: Error) => toast.error(error?.message || "Failed to add medication"),
   })
 
-  const onSubmit = (values: MedicationFormValues) => {
-    mutation.mutate(values)
-  }
+  const onSubmit = (values: MedicationFormValues) => mutation.mutate(values)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Medication Name
-        </label>
-        <Input {...register("name")} />
-        {errors.name && (
-          <p className="text-red-500 text-sm">
-            {errors.name.message}
-          </p>
-        )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-xl shadow-md">
+      <h2 className="text-2xl font-bold text-gray-900">Add New Medication</h2>
+
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Medication Name</label>
+        <Input {...register("name")} placeholder="E.g., Paracetamol" />
+        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Dosage
-        </label>
-        <Input {...register("dosage")} />
-        {errors.dosage && (
-          <p className="text-red-500 text-sm">
-            {errors.dosage.message}
-          </p>
-        )}
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Dosage</label>
+        <Input {...register("dosage")} placeholder="E.g., 500mg" />
+        {errors.dosage && <p className="text-red-500 text-sm">{errors.dosage.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Frequency
-        </label>
-        <select
-          {...register("frequency")}
-          className="w-full border rounded-md p-2"
-        >
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Frequency</label>
+        <select {...register("frequency")} className="w-full border rounded-md p-2">
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="every_other_day">Every Other Day</option>
           <option value="monthly">Monthly</option>
         </select>
-        {errors.frequency && (
-          <p className="text-red-500 text-sm">
-            {errors.frequency.message}
-          </p>
-        )}
+        {errors.frequency && <p className="text-red-500 text-sm">{errors.frequency.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Times Per Day
-        </label>
-        <Input
-          type="number"
-          min={1}
-          {...register("frequency_per_day", {
-            valueAsNumber: true,
-          })}
-        />
-        {errors.frequency_per_day && (
-          <p className="text-red-500 text-sm">
-            {errors.frequency_per_day.message}
-          </p>
-        )}
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Times Per Day</label>
+        <Input type="number" min={1} {...register("frequency_per_day", { valueAsNumber: true })} />
+        {errors.frequency_per_day && <p className="text-red-500 text-sm">{errors.frequency_per_day.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Duration (Days)
-        </label>
-        <Input
-          type="number"
-          min={1}
-          {...register("duration_days", {
-            valueAsNumber: true,
-          })}
-        />
-        {errors.duration_days && (
-          <p className="text-red-500 text-sm">
-            {errors.duration_days.message}
-          </p>
-        )}
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Duration (Days)</label>
+        <Input type="number" min={1} {...register("duration_days", { valueAsNumber: true })} />
+        {errors.duration_days && <p className="text-red-500 text-sm">{errors.duration_days.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Time(s)
-        </label>
-
-        {Array.from({ length: frequencyPerDay }).map((_, index) => (
-          <Input
-            key={index}
-            type="time"
-            {...register(`time.${index}` as const)}
-            className="mb-2"
-          />
-        ))}
-
-        {errors.time && (
-          <p className="text-red-500 text-sm">
-            {errors.time.message as string}
-          </p>
-        )}
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Time(s)</label>
+        <div className="flex flex-wrap gap-2">
+          {Array.from({ length: frequencyPerDay }).map((_, index) => (
+            <Input
+              key={index}
+              type="time"
+              {...register(`time.${index}` as const)}
+              className="flex-1 min-w-30"
+            />
+          ))}
+        </div>
+        {errors.time && <p className="text-red-500 text-sm">{errors.time.message as string}</p>}
       </div>
 
-      <Button
-        type="submit"
-        disabled={mutation.isPending || !userId}
-        className="w-full"
-      >
+      <Button type="submit" disabled={mutation.isPending || !userId} className="w-full">
         {mutation.isPending ? "Adding..." : "Add Medication"}
       </Button>
     </form>

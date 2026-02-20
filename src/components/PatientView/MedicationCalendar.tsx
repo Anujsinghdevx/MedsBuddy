@@ -11,7 +11,16 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth()
+
+  const firstDayOfMonth = new Date(year, month, 1)
+  const startingWeekday = firstDayOfMonth.getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  const monthLabel = firstDayOfMonth.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  })
+
   const logsMap: Record<string, MedicationLogWithMedications[]> = {}
 
   logs.forEach((log) => {
@@ -23,26 +32,37 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
   const getStatusColor = (status: string | null) => {
     switch (status) {
       case "taken":
-        return "bg-green-500"
+        return "bg-emerald-500"
       case "missed":
-        return "bg-red-500"
+        return "bg-destructive"
       default:
-        return "bg-gray-300"
+        return "bg-muted-foreground/30"
     }
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Medication Calendar</h2>
+    <div className="space-y-6">
 
-      <Card className="p-4">
-        <div className="grid grid-cols-7 gap-2 mb-2 text-sm font-medium text-gray-500 text-center">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold tracking-tight">
+          {monthLabel}
+        </h2>
+      </div>
+
+      <Card className="p-6 rounded-2xl shadow-sm">
+
+        <div className="grid grid-cols-7 mb-4 text-sm font-medium text-muted-foreground text-center">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-3">
+
+          {Array.from({ length: startingWeekday }).map((_, i) => (
+            <div key={`empty-${i}`} />
+          ))}
+
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const date = new Date(year, month, i + 1)
             const dateStr = date.toLocaleDateString("en-CA")
@@ -56,31 +76,24 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
             return (
               <div
                 key={i}
-                className={`h-20 flex flex-col items-center justify-start rounded-md p-1 text-sm cursor-pointer border ${isToday ? "border-blue-500" : "border-transparent"
-                  } hover:border-gray-400 transition-colors`}
-                title={
-                  dayLogs.length > 0
-                    ? dayLogs
-                        .map(
-                          (log) =>
-                            `${log.medications?.name || "Unknown"}: ${log.status || "pending"}`
-                        )
-                        .join("\n")
-                    : "No medications scheduled"
-                }
+                className={`min-h-22.5 rounded-xl border p-2 text-sm transition-all
+                  ${isToday
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-muted-foreground/40"
+                  }`}
               >
-                <div className="w-full text-center font-medium mb-1">
+                <div className="text-right text-xs font-medium mb-2">
                   {i + 1}
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-1">
+                <div className="flex flex-wrap gap-1">
                   {dayLogs.map((log, idx) => (
                     <span
                       key={idx}
                       className={`w-2 h-2 rounded-full ${getStatusColor(
                         log.status
                       )}`}
-                    ></span>
+                    />
                   ))}
                 </div>
               </div>
@@ -88,20 +101,21 @@ export function MedicationCalendar({ logs }: MedicationCalendarProps) {
           })}
         </div>
 
-        <div className="flex space-x-4 mt-4 text-sm items-center">
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-green-500 rounded-full mr-1"></span>
+        <div className="flex flex-wrap gap-6 mt-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-emerald-500" />
             Taken
           </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-red-500 rounded-full mr-1"></span>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-destructive" />
             Missed
           </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-gray-300 rounded-full mr-1"></span>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-muted-foreground/30" />
             Pending
           </div>
         </div>
+
       </Card>
     </div>
   )

@@ -48,7 +48,7 @@ export function MedicationCard({ log }: MedicationCardProps) {
 
     onError: (err: Error) => {
       toast.error(err.message || "Failed to mark as taken")
-      setStatus(log.status ?? "pending") 
+      setStatus(log.status ?? "pending")
     },
   })
 
@@ -83,10 +83,13 @@ export function MedicationCard({ log }: MedicationCardProps) {
   }
 
   return (
-    <div className="border rounded-lg p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-semibold text-lg">{log.medications?.name}</p>
+    <div className="rounded-2xl border bg-card p-5 shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
+      
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <p className="text-lg font-semibold">
+            {log.medications?.name}
+          </p>
           <p className="text-sm text-muted-foreground">
             {log.medications?.dosage}
           </p>
@@ -97,31 +100,36 @@ export function MedicationCard({ log }: MedicationCardProps) {
         </Badge>
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <div className="text-sm text-muted-foreground">
         Scheduled at{" "}
-        {new Date(log.scheduled_at).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </p>
+        <span className="font-medium text-foreground">
+          {new Date(log.scheduled_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </span>
+      </div>
 
       {status === "pending" && (
-        <div className="space-y-3">
+        <div className="space-y-4 pt-2">
+
           <label
             htmlFor={`file-upload-${log.id}`}
-            className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-gray-50 transition-colors overflow-hidden"
+            className="group flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all
+                       border-muted-foreground/30 hover:border-primary/60 hover:bg-muted/40 overflow-hidden"
           >
             {preview ? (
               <img
                 src={preview}
-                alt="Preview"
-                className="object-contain w-full h-full"
+                alt="Proof preview"
+                className="object-contain w-full h-full rounded-xl"
               />
             ) : (
-              <p className="text-sm text-gray-400 text-center">
-                Click or drag file here to upload proof (optional)
+              <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                Upload proof (optional)
               </p>
             )}
+
             <input
               id={`file-upload-${log.id}`}
               type="file"
@@ -134,14 +142,12 @@ export function MedicationCard({ log }: MedicationCardProps) {
           <Button
             onClick={handleMarkTaken}
             disabled={mutation.isPending}
-            className="w-full"
+            className="w-full rounded-xl"
           >
-            {mutation.isPending ? "Uploading..." : "Mark as Taken"}
+            {mutation.isPending ? "Processing..." : "Mark as Taken"}
           </Button>
         </div>
       )}
-
-      {/* Proof image functionality can be added here when implemented */}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import "./globals.css"
 import ReactQueryProvider from "@/providers/react-query-provider"
 import { SupabaseProvider } from "@/providers/supabase-provider"
 import { Toaster } from "sonner"
+import Footer from "@/components/Footer"
 
 export default function RootLayout({
   children,
@@ -17,6 +18,7 @@ export default function RootLayout({
             <Navbar />
             {children}
               <Toaster richColors position="top-right" />
+              <Footer />
           </ReactQueryProvider>
         </SupabaseProvider>
       </body>

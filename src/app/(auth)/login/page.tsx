@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { motion } from "framer-motion"
+import { LogIn } from "lucide-react"
 
 export default function LoginPage() {
   const supabase = createClient()
@@ -21,7 +23,6 @@ export default function LoginPage() {
 
     try {
       setLoading(true)
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -39,7 +40,6 @@ export default function LoginPage() {
 
       toast.success("Welcome back!")
       router.push("/dashboard")
-
     } catch {
       toast.error("Something went wrong. Please try again.")
     } finally {
@@ -48,34 +48,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <form onSubmit={handleLogin} className="space-y-4 w-80">
-        <h1 className="text-2xl font-bold">Login</h1>
+    <div className="flex min-h-screen bg-[#F6FAF9] items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-white rounded-3xl shadow-lg p-10 space-y-8"
+      >
+        <div className="text-center space-y-2">
+          <div className="flex justify-center">
+            <div className="bg-teal-100 text-teal-700 p-4 rounded-full">
+              <LogIn size={28} />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Enter your credentials to continue managing medications and care
+          </p>
+        </div>
 
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Email</label>
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="py-3"
+            />
+          </div>
 
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Password</label>
+            <Input
+              type="password"
+              placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="py-3"
+            />
+          </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white text-base font-semibold rounded-xl transition"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+
+        <div className="text-center text-sm text-gray-500">
+          Don’t have an account?{" "}
+          <a href="/signup" className="text-teal-600 font-medium hover:underline">
+            Sign Up
+          </a>
+        </div>
+      </motion.div>
     </div>
   )
 }

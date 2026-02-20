@@ -121,7 +121,6 @@ export default function MedicationCard({
           </Button>
         </div>
 
-        {/* Proof image functionality can be added here when implemented */}
       </CardContent>
     </Card>
   )

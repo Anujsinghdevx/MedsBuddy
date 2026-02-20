@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { MedicationLogWithUser } from "@/types/supabase"
+import { calculateCaretakerStats } from "@/lib/utils"
 import { GreetingSection } from "./GreetingSection"
 import { StatsGrid } from "./StatsGrid"
 import { RecentActivity } from "./RecentActivity"
 import { QuickActions } from "./QuickActions"
-import { CalendarOverview } from "./CalendarOverview"
-import { calculateCaretakerStats } from "@/lib/utils"
 import CaretakerAddMedicationForm from "./CaretakerAddMedication"
-import { MedicationLogWithUser } from "@/types/supabase"
+import { CalendarOverview } from "./CalendarOverview"
 
 export function CaretakerView() {
   const supabase = createClient()
