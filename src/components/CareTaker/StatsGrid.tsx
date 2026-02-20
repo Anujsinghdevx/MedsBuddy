@@ -7,7 +7,7 @@ interface StatsGridProps {
 
 export function StatsGrid({ stats }: StatsGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard title="Adherence Rate" value={`${stats.adherenceRate}%`} color="emerald" />
       <StatCard title="Current Streak" value={stats.streak} color="blue" />
       <StatCard title="Missed This Month" value={stats.missedThisMonth} color="destructive" />
@@ -31,7 +31,7 @@ function StatCard({ title, value, color = "primary" }: StatCardProps) {
   }
 
   return (
-    <Card className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="pb-0">
         <CardTitle className="text-sm text-gray-500">{title}</CardTitle>
       </CardHeader>

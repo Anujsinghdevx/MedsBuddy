@@ -22,10 +22,7 @@ export async function fetchMedications() {
   return data
 }
 
-
-export async function createMedication(
-  values: MedicationInsert,
-) {
+export async function createMedication(values: MedicationInsert) {
   const res = await fetch("/api/medication/create", {
     method: "POST",
     headers: {
@@ -45,12 +42,9 @@ export async function createMedication(
 }
 
 export async function deleteMedication(id: string) {
-    const supabase = createClient()
+  const supabase = createClient()
 
-    const { error } = await supabase
-        .from("medications")
-        .delete()
-        .eq("id", id)
+  const { error } = await supabase.from("medications").delete().eq("id", id)
 
-    if (error) throw error
+  if (error) throw error
 }

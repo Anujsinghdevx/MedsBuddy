@@ -2,22 +2,13 @@ import { z } from "zod"
 
 export const medicationSchema = z
   .object({
-    name: z
-      .string()
-      .min(1, "Medication name is required")
-      .max(100, "Medication name is too long"),
+    name: z.string().min(1, "Medication name is required").max(100, "Medication name is too long"),
 
-    dosage: z
-      .string()
-      .min(1, "Dosage is required")
-      .max(100, "Dosage is too long"),
+    dosage: z.string().min(1, "Dosage is required").max(100, "Dosage is too long"),
 
-    frequency: z.enum(
-      ["daily", "weekly", "every_other_day", "monthly"],
-      {
-        message: "Frequency is required",
-      }
-    ),
+    frequency: z.enum(["daily", "weekly", "every_other_day", "monthly"], {
+      message: "Frequency is required",
+    }),
 
     frequency_per_day: z
       .number({
@@ -36,12 +27,7 @@ export const medicationSchema = z
       .max(365, "Duration cannot exceed 1 year"),
 
     time: z
-      .array(
-        z.string().regex(
-          /^([01]\d|2[0-3]):([0-5]\d)$/,
-          "Time must be in HH:MM format"
-        )
-      )
+      .array(z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:MM format"))
       .min(1, "At least one time is required"),
   })
   .superRefine((data, ctx) => {

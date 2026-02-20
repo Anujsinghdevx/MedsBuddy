@@ -5,11 +5,7 @@ import { SupabaseProvider } from "@/providers/supabase-provider"
 import { Toaster } from "sonner"
 import Footer from "@/components/Footer"
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html>
       <body>
@@ -17,8 +13,8 @@ export default function RootLayout({
           <ReactQueryProvider>
             <Navbar />
             {children}
-              <Toaster richColors position="top-right" />
-              <Footer />
+            <Toaster richColors position="top-right" />
+            <Footer />
           </ReactQueryProvider>
         </SupabaseProvider>
       </body>

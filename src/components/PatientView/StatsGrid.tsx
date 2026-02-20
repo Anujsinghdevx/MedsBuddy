@@ -9,8 +9,7 @@ interface StatsGridProps {
 
 export function StatsGrid({ stats }: StatsGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       <StatCard
         title="Consistency Streak"
         value={`${stats.streak} days`}
@@ -34,7 +33,6 @@ export function StatsGrid({ stats }: StatsGridProps) {
         icon={TrendingUp}
         accent="bg-emerald-50 text-emerald-600"
       />
-
     </div>
   )
 }
@@ -47,36 +45,22 @@ interface StatCardProps {
   accent: string
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-  accent,
-}: StatCardProps) {
+function StatCard({ title, value, description, icon: Icon, accent }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
-
+    <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
       <div className="flex items-center gap-4">
-        <div className={`p-3 rounded-xl ${accent}`}>
+        <div className={`rounded-xl p-3 ${accent}`}>
           <Icon size={22} />
         </div>
 
-        <h3 className="text-base font-medium text-gray-600">
-          {title}
-        </h3>
+        <h3 className="text-base font-medium text-gray-600">{title}</h3>
       </div>
 
       <div>
-        <p className="text-3xl md:text-4xl font-semibold text-gray-900">
-          {value}
-        </p>
+        <p className="text-3xl font-semibold text-gray-900 md:text-4xl">{value}</p>
       </div>
 
-      <p className="text-sm text-gray-500 leading-relaxed">
-        {description}
-      </p>
-
+      <p className="text-sm leading-relaxed text-gray-500">{description}</p>
     </div>
   )
 }

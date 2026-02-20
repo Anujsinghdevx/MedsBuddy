@@ -3,12 +3,14 @@
 Assignment project: a medication reminder app that helps patients mark daily meds as taken and notifies caretakers if a dose is missed.
 
 ## Problem Summary
+
 - Patients mark each medication as taken for today.
 - If a medication is not marked within a set time, a reminder email is sent to the caretaker.
 - Caretakers can add medications for one patient per account.
 - Patient and caretaker share the same login for simplicity.
 
 ## Features
+
 - Signup and login with Supabase Auth.
 - Add medications with name, dosage, frequency, and time(s).
 - View medication list and daily log.
@@ -16,6 +18,7 @@ Assignment project: a medication reminder app that helps patients mark daily med
 - Background check for missed doses with email notification.
 
 ## Tech Stack
+
 - Next.js (App Router) + TypeScript
 - Tailwind CSS and shadcn/ui
 - Supabase (Auth, Database, Storage)
@@ -24,6 +27,7 @@ Assignment project: a medication reminder app that helps patients mark daily med
 - SendGrid for email delivery
 
 ## Project Structure (high level)
+
 - [src/app](src/app) - routes, layouts, and API handlers
 - [src/components](src/components) - UI and feature components
 - [src/lib](src/lib) - Supabase clients and API helpers
@@ -31,6 +35,7 @@ Assignment project: a medication reminder app that helps patients mark daily med
 - [supabase](supabase) - Supabase config and functions
 
 ## Environment Variables
+
 Create a `.env.local` in the project root:
 
 ```
@@ -42,12 +47,15 @@ SENDGRID_API_KEY=
 ```
 
 ## Database Tables
+
 Expected tables (Supabase):
+
 - `medications`
 - `medication_logs`
 - `users`
 
 ## Local Development
+
 Install dependencies:
 
 ```
@@ -61,9 +69,11 @@ npm run dev
 ```
 
 ## Deployment
+
 Deploy to Vercel or Netlify. Set the same environment variables in the hosting dashboard.
 
 ## System Diagram
+
 ```mermaid
 flowchart LR
 	U[User] -->|Login/Signup| UI[Next.js App]
@@ -81,6 +91,7 @@ flowchart LR
 ```
 
 ## Evaluation Checklist Mapping
+
 - Code organization: components, lib, and providers are separated.
 - Error handling: API routes and client mutations handle failures.
 - Type safety: TypeScript types are used throughout (no `any`).
@@ -90,4 +101,5 @@ flowchart LR
 - Security: input validation, server-side auth checks, protected routes.
 
 ## Assignment Notes
+
 The UI follows the sample behavior but uses a custom design. Patient and caretaker are available under the same account as required.

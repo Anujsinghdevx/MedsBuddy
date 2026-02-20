@@ -10,10 +10,16 @@ interface MedicationLog {
   scheduled_for: string
   status: "taken" | "missed" | "skipped" | "pending" | null
   proof_url: string | null
-  medications: {
-    name: string
-    dosage: string | null
-  } | null
+  medications:
+    | {
+        name: string
+        dosage: string | null
+      }[]
+    | {
+        name: string
+        dosage: string | null
+      }
+    | null
 }
 
 export function RecentActivity() {
@@ -28,7 +34,9 @@ export function RecentActivity() {
 
         console.log("FRONTEND DATA:", data)
 
-        if (data?.logs && Array.isArray(data.logs)) {
+        if (data?.data?.logs && Array.isArray(data.data.logs)) {
+          setLogs(data.data.logs)
+        } else if (data?.logs && Array.isArray(data.logs)) {
           setLogs(data.logs)
         } else {
           setLogs([])
@@ -77,56 +85,56 @@ export function RecentActivity() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-4">
-      <h2 className="text-2xl font-semibold text-gray-900">
-        Recent Activity
-      </h2>
+    <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+      <h2 className="text-2xl font-semibold text-gray-900">Recent Activity</h2>
 
-      {logs.length === 0 && (
-        <p className="text-gray-500 text-sm">No recent activity.</p>
-      )}
+      {logs.length === 0 && <p className="text-sm text-gray-500">No recent activity.</p>}
 
       {logs.map((log) => (
         <div
           key={log.id}
-          className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition"
-        > 
+          className="flex items-center justify-between rounded-lg border border-gray-100 p-4 transition hover:bg-gray-50"
+        >
           <div className="flex-1 space-y-1">
             <div className="font-medium text-gray-900">
-              {log.medications?.name ?? "Unknown Medication"}
+              {Array.isArray(log.medications)
+                ? (log.medications[0]?.name ?? "Unknown Medication")
+                : (log.medications?.name ?? "Unknown Medication")}
             </div>
 
-            {log.medications?.dosage && (
+            {(Array.isArray(log.medications)
+              ? log.medications[0]?.dosage
+              : log.medications?.dosage) && (
               <div className="text-sm text-gray-500">
-                {log.medications.dosage}
+                {Array.isArray(log.medications)
+                  ? log.medications[0]?.dosage
+                  : log.medications?.dosage}
               </div>
             )}
 
-            <div className="text-xs text-gray-400">
-              {log.scheduled_for}
-            </div>
+            <div className="text-xs text-gray-400">{log.scheduled_for}</div>
           </div>
 
           <div className="flex items-center justify-center gap-3">
-  <Badge
-    variant={getBadgeVariant(log.status)}
-    className="px-3 py-1 text-xs font-medium rounded-full"
-  >
-    {getStatusLabel(log.status)}
-  </Badge>
+            <Badge
+              variant={getBadgeVariant(log.status)}
+              className="rounded-full px-3 py-1 text-xs font-medium"
+            >
+              {getStatusLabel(log.status)}
+            </Badge>
 
-  {log.status === "taken" && log.proof_url && (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => window.open(log.proof_url!, "_blank")}
-      className="flex items-center gap-2 text-primary hover:bg-primary/10"
-    >
-      <ImageIcon className="h-4 w-4" />
-      <span>See Proof</span>
-    </Button>
-  )}
-</div>
+            {log.status === "taken" && log.proof_url && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.open(log.proof_url!, "_blank")}
+                className="text-primary hover:bg-primary/10 flex items-center gap-2"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>See Proof</span>
+              </Button>
+            )}
+          </div>
         </div>
       ))}
     </div>

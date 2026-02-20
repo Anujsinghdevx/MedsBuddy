@@ -9,20 +9,12 @@ export function cn(...inputs: ClassValue[]) {
 export function calculateStats(logs: MedicationLog[]): MedicationStats {
   const today = new Date().toISOString().split("T")[0]
 
-  const todayLogs = logs.filter(
-    (l) => l.scheduled_for === today
-  )
+  const todayLogs = logs.filter((l) => l.scheduled_for === today)
 
-  const takenToday = todayLogs.filter(
-    (l) => l.status === "taken"
-  ).length
+  const takenToday = todayLogs.filter((l) => l.status === "taken").length
 
   const todayStatus =
-    todayLogs.length === 0
-      ? "No meds"
-      : takenToday === todayLogs.length
-      ? "Complete"
-      : "Pending"
+    todayLogs.length === 0 ? "No meds" : takenToday === todayLogs.length ? "Complete" : "Pending"
 
   const now = new Date()
   const month = now.getMonth()
@@ -33,19 +25,13 @@ export function calculateStats(logs: MedicationLog[]): MedicationStats {
     return d.getMonth() === month && d.getFullYear() === year
   })
 
-  const monthlyTaken = monthlyLogs.filter(
-    (l) => l.status === "taken"
-  ).length
+  const monthlyTaken = monthlyLogs.filter((l) => l.status === "taken").length
 
   const monthlyRate =
-    monthlyLogs.length === 0
-      ? 0
-      : Math.round((monthlyTaken / monthlyLogs.length) * 100)
+    monthlyLogs.length === 0 ? 0 : Math.round((monthlyTaken / monthlyLogs.length) * 100)
 
   const sorted = [...logs].sort(
-    (a, b) =>
-      new Date(b.scheduled_for).getTime() -
-      new Date(a.scheduled_for).getTime()
+    (a, b) => new Date(b.scheduled_for).getTime() - new Date(a.scheduled_for).getTime()
   )
 
   let streak = 0

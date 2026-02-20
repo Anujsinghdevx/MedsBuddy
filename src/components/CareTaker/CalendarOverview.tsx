@@ -41,23 +41,18 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
 
   return (
     <div className="space-y-6">
-
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          {monthLabel}
-        </h2>
+        <h2 className="text-2xl font-semibold tracking-tight">{monthLabel}</h2>
       </div>
 
-      <Card className="p-6 rounded-2xl shadow-sm">
-
-        <div className="grid grid-cols-7 mb-4 text-sm font-medium text-muted-foreground text-center">
+      <Card className="rounded-2xl p-6 shadow-sm">
+        <div className="text-muted-foreground mb-4 grid grid-cols-7 text-center text-sm font-medium">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
 
         <div className="grid grid-cols-7 gap-3">
-
           {Array.from({ length: startingWeekday }).map((_, i) => (
             <div key={`empty-${i}`} />
           ))}
@@ -76,9 +71,10 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
               <div
                 key={i}
                 className={`min-h-22.5 rounded-xl border p-2 text-sm transition-all
-                  ${isToday
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-muted-foreground/40"
+                  ${
+                    isToday
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-muted-foreground/40"
                   }`}
                 title={
                   dayLogs.length > 0
@@ -91,15 +87,13 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
                     : "No medications scheduled"
                 }
               >
-                <div className="text-right text-xs font-medium mb-2">
-                  {i + 1}
-                </div>
+                <div className="mb-2 text-right text-xs font-medium">{i + 1}</div>
 
                 <div className="flex flex-wrap gap-1">
                   {dayLogs.map((log, idx) => (
                     <span
                       key={idx}
-                      className={`w-2 h-2 rounded-full ${getStatusColor(log.status)}`}
+                      className={`h-2 w-2 rounded-full ${getStatusColor(log.status)}`}
                     />
                   ))}
                 </div>
@@ -108,21 +102,20 @@ export function CalendarOverview({ logs }: CalendarOverviewProps) {
           })}
         </div>
 
-        <div className="flex flex-wrap gap-6 mt-6 text-sm text-muted-foreground">
+        <div className="text-muted-foreground mt-6 flex flex-wrap gap-6 text-sm">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-500" />
+            <span className="h-3 w-3 rounded-full bg-emerald-500" />
             Taken
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-destructive" />
+            <span className="bg-destructive h-3 w-3 rounded-full" />
             Missed
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-muted-foreground/30" />
+            <span className="bg-muted-foreground/30 h-3 w-3 rounded-full" />
             Pending
           </div>
         </div>
-
       </Card>
     </div>
   )

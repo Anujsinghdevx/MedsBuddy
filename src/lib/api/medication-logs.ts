@@ -49,5 +49,3 @@ export async function markMedicationTaken(logId: string, file?: File) {
 
   return res.json()
 }
-
-

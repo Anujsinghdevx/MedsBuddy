@@ -22,11 +22,9 @@ export default function Navbar() {
 
     fetchUser()
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null)
-      }
-    )
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
 
     return () => {
       listener.subscription.unsubscribe()
@@ -40,14 +38,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="w-full bg-slate-50/90 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-
-        <div className="flex flex-col leading-tight cursor-pointer "  onClick={() => router.push("/")}>
+    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-slate-50/90 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div
+          className="flex cursor-pointer flex-col leading-tight "
+          onClick={() => router.push("/")}
+        >
           <span className="text-xl font-semibold text-teal-700">MedsBuddy</span>
-          <span className="text-xs text-slate-500">
-            Because every dose matters.
-          </span>
+          <span className="text-xs text-slate-500">Because every dose matters.</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -64,7 +62,7 @@ export default function Navbar() {
 
               <Button
                 size="sm"
-                className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl"
+                className="rounded-xl bg-teal-600 text-white hover:bg-teal-700"
                 onClick={handleLogout}
               >
                 Logout
@@ -83,7 +81,7 @@ export default function Navbar() {
 
               <Button
                 size="sm"
-                className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl"
+                className="rounded-xl bg-teal-600 text-white hover:bg-teal-700"
                 onClick={() => router.push("/signup")}
               >
                 Get Started

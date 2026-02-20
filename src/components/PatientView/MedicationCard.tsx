@@ -64,23 +64,17 @@ export function MedicationCard({ log }: MedicationCardProps) {
   }
 
   return (
-    <div className="flex justify-between items-start">
+    <div className="flex items-start justify-between">
       <div className="space-y-1">
-        <p className="text-lg font-semibold">
-          {log.medications?.name}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {log.medications?.dosage}
-        </p>
+        <p className="text-lg font-semibold">{log.medications?.name}</p>
+        <p className="text-muted-foreground text-sm">{log.medications?.dosage}</p>
       </div>
 
-      <Badge variant={getBadgeVariant()}>
-        {getStatusLabel()}
-      </Badge>
+      <Badge variant={getBadgeVariant()}>{getStatusLabel()}</Badge>
 
-      <div className="text-sm text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         Scheduled at{" "}
-        <span className="font-medium text-foreground">
+        <span className="text-foreground font-medium">
           {new Date(log.scheduled_at).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -92,17 +86,17 @@ export function MedicationCard({ log }: MedicationCardProps) {
         <div className="space-y-4 pt-2">
           <label
             htmlFor={`file-upload-${log.id}`}
-            className="group flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all
-                       border-muted-foreground/30 hover:border-primary/60 hover:bg-muted/40 overflow-hidden"
+            className="border-muted-foreground/30 hover:border-primary/60 hover:bg-muted/40 group flex h-32 w-full cursor-pointer flex-col items-center justify-center overflow-hidden
+                       rounded-xl border-2 border-dashed transition-all"
           >
             {preview ? (
               <img
                 src={preview}
                 alt="Proof preview"
-                className="object-contain w-full h-full rounded-xl"
+                className="h-full w-full rounded-xl object-contain"
               />
             ) : (
-              <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+              <p className="text-muted-foreground group-hover:text-foreground text-sm transition-colors">
                 Upload proof (optional)
               </p>
             )}

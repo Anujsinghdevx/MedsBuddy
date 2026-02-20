@@ -15,11 +15,7 @@ interface MedicationCardProps {
   today: string
 }
 
-export default function MedicationCard({
-  medication,
-  log,
-  today,
-}: MedicationCardProps) {
+export default function MedicationCard({ medication, log, today }: MedicationCardProps) {
   const queryClient = useQueryClient()
   const supabase = useSupabase()
 
@@ -47,7 +43,7 @@ export default function MedicationCard({
       const res = await fetch(`/api/medication-logs/${log.id}/mark-taken`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${await supabase.auth.getSession().then(s => s.data.session?.access_token || "")}`
+          Authorization: `Bearer ${await supabase.auth.getSession().then((s) => s.data.session?.access_token || "")}`,
         },
         body: formData,
       })
@@ -61,9 +57,7 @@ export default function MedicationCard({
       toast.success("Medication marked as taken with proof")
     },
     onError: (error: unknown) => {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to mark medication"
-      )
+      toast.error(error instanceof Error ? error.message : "Failed to mark medication")
     },
   })
 
@@ -77,11 +71,11 @@ export default function MedicationCard({
 
   return (
     <Card>
-      <CardContent className="p-4 space-y-3">
-        <div className="flex justify-between items-center">
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-lg">{medication.name}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-lg font-semibold">{medication.name}</h3>
+            <p className="text-muted-foreground text-sm">
               {medication.dosage} • {medication.frequency}
             </p>
           </div>
@@ -93,7 +87,7 @@ export default function MedicationCard({
           )}
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {!isTaken && (
             <>
               <label>
@@ -120,7 +114,6 @@ export default function MedicationCard({
             {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>
-
       </CardContent>
     </Card>
   )

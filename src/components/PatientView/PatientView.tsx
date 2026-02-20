@@ -21,13 +21,15 @@ export function PatientView() {
   const fetchLogs = async () => {
     const { data } = await supabase
       .from("medication_logs")
-      .select(`
+      .select(
+        `
         *,
         medications (
           name,
           dosage
         )
-      `)
+      `
+      )
       .order("scheduled_at", { ascending: true })
 
     setLogs(data || [])

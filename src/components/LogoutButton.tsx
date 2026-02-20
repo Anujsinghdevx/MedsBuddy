@@ -18,12 +18,9 @@ export default function LogoutButton() {
       if (error) throw error
       toast.success("Logged out successfully")
       router.replace("/login")
-      router.refresh() 
+      router.refresh()
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to logout. Please try again."
+      const message = error instanceof Error ? error.message : "Failed to logout. Please try again."
 
       toast.error(message)
     } finally {
@@ -32,11 +29,7 @@ export default function LogoutButton() {
   }
 
   return (
-    <Button
-      variant="destructive"
-      onClick={handleLogout}
-      disabled={isLoading}
-    >
+    <Button variant="destructive" onClick={handleLogout} disabled={isLoading}>
       {isLoading ? "Logging out..." : "Logout"}
     </Button>
   )

@@ -1,0 +1,72 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.*
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage
+.nyc_output
+
+# Vercel
+.vercel
+
+# Supabase
+supabase/
+supabase/.branches
+supabase/.temp
+
+# Generated files
+supabase.types.ts
+*.generated.*
+
+# Lock files (optional - comment out if you want to format them)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Config files that shouldn't be formatted (optional)
+# tsconfig.json
+# next.config.ts
+
+# Public assets
+public/**/*.svg
+public/**/*.png
+public/**/*.jpg
+public/**/*.jpeg
+public/**/*.gif
+public/**/*.ico
+
+# Scripts
+create-dirs.js

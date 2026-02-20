@@ -11,25 +11,19 @@ interface TodayMedicationsProps {
 export function TodayMedications({ logs }: TodayMedicationsProps) {
   const today = new Date().toISOString().split("T")[0]
 
-  const todayLogs = logs.filter(
-    (log: MedicationLogWithMedications) =>
-      log.scheduled_for === today
-  )
+  const todayLogs = logs.filter((log: MedicationLogWithMedications) => log.scheduled_for === today)
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-10 space-y-8">
-
+    <div className="space-y-8 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm md:p-10">
       <div className="flex items-center gap-4">
-        <div className="bg-teal-50 text-teal-600 p-3 rounded-xl">
+        <div className="rounded-xl bg-teal-50 p-3 text-teal-600">
           <Pill size={24} />
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Today’s Medications
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Today’s Medications</h2>
 
-          <p className="text-gray-600 text-base">
+          <p className="text-base text-gray-600">
             {todayLogs.length > 0
               ? `${todayLogs.length} scheduled for today`
               : "Nothing scheduled for today"}
@@ -38,8 +32,8 @@ export function TodayMedications({ logs }: TodayMedicationsProps) {
       </div>
 
       {todayLogs.length === 0 && (
-        <div className="bg-teal-50 border border-teal-100 rounded-xl p-6">
-          <p className="text-teal-700 text-base leading-relaxed">
+        <div className="rounded-xl border border-teal-100 bg-teal-50 p-6">
+          <p className="text-base leading-relaxed text-teal-700">
             You’re all set for today. Take this time to rest and stay well.
           </p>
         </div>

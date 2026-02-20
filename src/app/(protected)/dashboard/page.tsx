@@ -12,8 +12,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F6FAF9]">
-      <div className="max-w-6xl mx-auto px-6 py-16 space-y-16">
-
+      <div className="mx-auto max-w-6xl space-y-16 px-6 py-16">
         {!role && (
           <>
             <motion.div
@@ -22,12 +21,9 @@ export default function DashboardPage() {
               transition={{ duration: 0.5 }}
               className="space-y-4"
             >
-              <h1 className="text-4xl font-semibold text-gray-900">
-                Today’s Care Dashboard
-              </h1>
-              <p className="text-lg text-gray-600 max-w-2xl leading-relaxed">
-                Everything you need to stay informed and supported —
-                simple, clear, and stress-free.
+              <h1 className="text-4xl font-semibold text-gray-900">Today’s Care Dashboard</h1>
+              <p className="max-w-2xl text-lg leading-relaxed text-gray-600">
+                Everything you need to stay informed and supported — simple, clear, and stress-free.
               </p>
             </motion.div>
 
@@ -41,51 +37,46 @@ export default function DashboardPage() {
                 How would you like to continue?
               </h2>
 
-              <div className="grid md:grid-cols-2 gap-10">
+              <div className="grid gap-10 md:grid-cols-2">
                 <div
                   onClick={() => setRole("patient")}
-                  className="cursor-pointer bg-white rounded-2xl p-10 border border-gray-100 shadow-sm hover:shadow-md transition"
+                  className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-10 shadow-sm transition hover:shadow-md"
                 >
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="bg-teal-50 text-teal-600 p-4 rounded-xl">
+                  <div className="mb-6 flex items-center gap-4">
+                    <div className="rounded-xl bg-teal-50 p-4 text-teal-600">
                       <User size={28} />
                     </div>
-                    <h3 className="text-xl font-semibold">
-                      I’m Taking My Medication
-                    </h3>
+                    <h3 className="text-xl font-semibold">I’m Taking My Medication</h3>
                   </div>
 
-                  <p className="text-gray-600 text-base leading-relaxed mb-8">
-                    Track today’s medicines, mark them as taken,
-                    and stay consistent with your care plan.
+                  <p className="mb-8 text-base leading-relaxed text-gray-600">
+                    Track today’s medicines, mark them as taken, and stay consistent with your care
+                    plan.
                   </p>
 
-                  <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-base rounded-xl">
+                  <Button className="w-full rounded-xl bg-teal-600 py-6 text-base text-white hover:bg-teal-700">
                     Continue
                   </Button>
                 </div>
 
                 <div
                   onClick={() => setRole("caretaker")}
-                  className="cursor-pointer bg-white rounded-2xl p-10 border border-gray-100 shadow-sm hover:shadow-md transition"
+                  className="cursor-pointer rounded-2xl border border-gray-100 bg-white p-10 shadow-sm transition hover:shadow-md"
                 >
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="bg-emerald-50 text-emerald-600 p-4 rounded-xl">
+                  <div className="mb-6 flex items-center gap-4">
+                    <div className="rounded-xl bg-emerald-50 p-4 text-emerald-600">
                       <HeartHandshake size={28} />
                     </div>
-                    <h3 className="text-xl font-semibold">
-                      I’m Caring for Someone
-                    </h3>
+                    <h3 className="text-xl font-semibold">I’m Caring for Someone</h3>
                   </div>
 
-                  <p className="text-gray-600 text-base leading-relaxed mb-8">
-                    Monitor adherence, receive updates, and
-                    ensure your loved one stays on track.
+                  <p className="mb-8 text-base leading-relaxed text-gray-600">
+                    Monitor adherence, receive updates, and ensure your loved one stays on track.
                   </p>
 
                   <Button
                     variant="outline"
-                    className="w-full border-teal-600 text-teal-700 hover:bg-teal-50 py-6 text-base rounded-xl"
+                    className="w-full rounded-xl border-teal-600 py-6 text-base text-teal-700 hover:bg-teal-50"
                   >
                     Continue
                   </Button>
@@ -115,7 +106,6 @@ export default function DashboardPage() {
             {role === "caretaker" && <CaretakerView />}
           </motion.div>
         )}
-
       </div>
     </div>
   )

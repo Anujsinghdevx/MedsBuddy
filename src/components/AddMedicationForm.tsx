@@ -3,10 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  medicationSchema,
-  MedicationFormValues,
-} from "@/lib/validations/medication"
+import { medicationSchema, MedicationFormValues } from "@/lib/validations/medication"
 import { createMedication } from "@/lib/api/medications"
 import { useSupabase } from "@/providers/supabase-provider"
 
@@ -20,12 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { toast } from "sonner"
 
@@ -51,14 +43,12 @@ export default function AddMedicationForm() {
 
       if (!user) throw new Error("User not authenticated")
 
-      return createMedication(
-        {
-          name: values.name.trim(),
-          dosage: values.dosage.trim(),
-          frequency: values.frequency.trim(),
-          time: values.time,
-        },
-      )
+      return createMedication({
+        name: values.name.trim(),
+        dosage: values.dosage.trim(),
+        frequency: values.frequency.trim(),
+        time: values.time,
+      })
     },
 
     onSuccess: () => {
@@ -70,9 +60,7 @@ export default function AddMedicationForm() {
 
     onError: (error: unknown) => {
       const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again."
+        error instanceof Error ? error.message : "Something went wrong. Please try again."
 
       toast.error(message)
     },
@@ -89,10 +77,7 @@ export default function AddMedicationForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="name"
@@ -149,11 +134,7 @@ export default function AddMedicationForm() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={mutation.isPending}
-            >
+            <Button type="submit" className="w-full" disabled={mutation.isPending}>
               {mutation.isPending ? "Adding..." : "Add Medication"}
             </Button>
           </form>

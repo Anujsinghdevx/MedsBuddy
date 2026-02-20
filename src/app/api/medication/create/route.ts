@@ -1,81 +1,128 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { AuthenticationError, DatabaseError, ValidationError } from "@/lib/errors"
 
-export async function POST(req: Request) {
-  const cookieStore = await cookies()
+export async function POST(req: NextRequest) {
+  try {
+    const cookieStore = await cookies()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name) {
+            return cookieStore.get(name)?.value
+          },
+          set(name, value, options) {
+            cookieStore.set({ name, value, ...options })
+          },
+          remove(name, options) {
+            cookieStore.set({ name, value: "", ...options })
+          },
         },
-        set(name, value, options) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name, options) {
-          cookieStore.set({ name, value: "", ...options })
-        },
-      },
+      }
+    )
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      throw new AuthenticationError("Authentication required")
     }
-  )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    const body = await req.json()
 
-  if (!user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-  }
-
-  const body = await req.json()
-
-  const { data: medication, error } = await supabase
-    .from("medications")
-    .insert({
-      ...body,
-      user_id: user.id,
-    })
-    .select()
-    .single()
-
-  if (error) {
-    return NextResponse.json({ message: error.message }, { status: 400 })
-  }
-
-  const today = new Date().toISOString().split("T")[0]
-
-  const logs = []
-
-  for (let day = 0; day < medication.duration_days; day++) {
-    const scheduledDate = new Date(today)
-    scheduledDate.setDate(scheduledDate.getDate() + day)
-    const formattedDate = scheduledDate.toISOString().split("T")[0]
-
-    for (const time of medication.time) {
-      logs.push({
-        medication_id: medication.id,
-        user_id: user.id,
-        scheduled_for: formattedDate,
-        scheduled_at: `${formattedDate}T${time}:00`,
-        status: "pending",
+    if (!body.name || !body.time || !body.duration_days) {
+      throw new ValidationError("Missing required fields", {
+        required: ["name", "time", "duration_days"],
       })
     }
-  }
 
-  const { error: logError } = await supabase
-    .from("medication_logs")
-    .insert(logs)
+    const { data: medication, error } = await supabase
+      .from("medications")
+      .insert({
+        ...body,
+        user_id: user.id,
+      })
+      .select()
+      .single()
 
-  if (logError) {
+    if (error) {
+      throw new DatabaseError("Failed to create medication", {
+        code: error.code,
+        details: error.details,
+      })
+    }
+
+    const today = new Date().toISOString().split("T")[0]
+    const logs = []
+
+    for (let day = 0; day < medication.duration_days; day++) {
+      const scheduledDate = new Date(today)
+      scheduledDate.setDate(scheduledDate.getDate() + day)
+      const formattedDate = scheduledDate.toISOString().split("T")[0]
+
+      for (const time of medication.time) {
+        logs.push({
+          medication_id: medication.id,
+          user_id: user.id,
+          scheduled_for: formattedDate,
+          scheduled_at: `${formattedDate}T${time}:00`,
+          status: "pending",
+        })
+      }
+    }
+
+    const { error: logError } = await supabase.from("medication_logs").insert(logs)
+
+    if (logError) {
+      throw new DatabaseError("Failed to create medication logs", {
+        code: logError.code,
+        details: logError.details,
+      })
+    }
+
     return NextResponse.json(
-      { message: logError.message },
-      { status: 400 }
+      {
+        success: true,
+        data: medication,
+        message: "Medication created successfully",
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error("Create Medication Error:", error)
+
+    if (
+      error instanceof AuthenticationError ||
+      error instanceof ValidationError ||
+      error instanceof DatabaseError
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: error.code,
+            message: error.message,
+            ...(error.details && { details: error.details }),
+          },
+        },
+        { status: error.statusCode }
+      )
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create medication",
+        },
+      },
+      { status: 500 }
     )
   }
-
-  return NextResponse.json(medication)
 }

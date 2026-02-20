@@ -29,7 +29,7 @@ export function QuickActions() {
         className="flex items-center space-x-2"
         variant="outline"
       >
-        <Mail className="w-4 h-4" />
+        <Mail className="h-4 w-4" />
         <span>Send Reminder Email</span>
       </Button>
     </div>

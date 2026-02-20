@@ -24,7 +24,7 @@ export default function MedicationList() {
   const { data: medications, isLoading: medsLoading } = useQuery({
     queryKey: ["medications"],
     queryFn: fetchMedications,
-    enabled: sessionReady, 
+    enabled: sessionReady,
   })
 
   const { data: logs, isLoading: logsLoading } = useQuery({
@@ -42,32 +42,19 @@ export default function MedicationList() {
   }
 
   if (!medications?.length) {
-    return (
-      <div className="text-center text-muted-foreground py-10">
-        No medications added yet.
-      </div>
-    )
+    return <div className="text-muted-foreground py-10 text-center">No medications added yet.</div>
   }
 
   return (
     <div className="space-y-4">
       {medications.map((med: Medication) => {
-        const log = logs?.find(
-          (l: MedicationLogWithMedications) => l.medication_id === med.id
-        )
+        const log = logs?.find((l: MedicationLogWithMedications) => l.medication_id === med.id)
 
         if (!log) {
           return null
         }
 
-        return (
-          <MedicationCard
-            key={med.id}
-            medication={med}
-            log={log}
-            today={today}
-          />
-        )
+        return <MedicationCard key={med.id} medication={med} log={log} today={today} />
       })}
     </div>
   )
