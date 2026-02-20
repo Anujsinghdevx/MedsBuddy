@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { MedicationLogWithUser } from "@/types/supabase"
+import { MedicationLogWithMedications } from "@/types/supabase"
 import { calculateCaretakerStats } from "@/lib/utils"
 import { GreetingSection } from "./GreetingSection"
 import { StatsGrid } from "./StatsGrid"
@@ -13,7 +13,7 @@ import { CalendarOverview } from "./CalendarOverview"
 
 export function CaretakerView() {
   const supabase = createClient()
-  const [logs, setLogs] = useState<MedicationLogWithUser[]>([])
+  const [logs, setLogs] = useState<MedicationLogWithMedications[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function CaretakerView() {
       `)
       .order("scheduled_at", { ascending: false })
 
-    setLogs(data || [])
+    setLogs((data as MedicationLogWithMedications[]) || [])
     setLoading(false)
   }
 
@@ -41,7 +41,7 @@ export function CaretakerView() {
     <div className="space-y-8">
       <GreetingSection userType="Caretaker" />
       <StatsGrid stats={stats} />
-      <RecentActivity logs={logs} />
+      <RecentActivity />
       <QuickActions />
       <CaretakerAddMedicationForm />
       <CalendarOverview logs={logs} />

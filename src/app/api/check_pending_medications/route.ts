@@ -18,7 +18,7 @@ type ReminderLog = {
 export async function GET() {
     try {
         const supabase = createClient(
-            process.env.SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
@@ -54,12 +54,13 @@ export async function GET() {
         }
 
         const logs: ReminderLog[] = data;
+        let sentCount = 0;
 
         for (const log of logs) {
             const medication = log.medications?.[0];
             const user = log.users?.[0];
 
-            if (!medication || !user?.email) continue;
+            if (!medication || !user?.email) continue; 
 
             const msg = {
                 to: user.email,
@@ -67,12 +68,12 @@ export async function GET() {
                 subject: "Medication Reminder 💊",
                 text: `Reminder to take ${medication.name} (${medication.dosage})`,
                 html: `
-                      <h2>Medication Reminder 💊</h2>
-                      <p>Please take your medication:</p>
-                      <strong>${medication.name}</strong><br/>
-                      Dosage: ${medication.dosage}
-             `,
-            };
+                       <h2>Medication Reminder 💊</h2>
+                       <p>Please take your medication:</p>
+                       <strong>${medication.name}</strong><br/>
+                       Dosage: ${medication.dosage}
+                      `,
+             };
 
             await sgMail.send(msg);
 
@@ -81,10 +82,12 @@ export async function GET() {
                 .update({ reminder_sent: true })
                 .eq("id", log.id)
                 .eq("reminder_sent", false);
+
+            sentCount++;
         }
 
         return NextResponse.json({
-            message: `Sent ${logs.length} reminder(s) successfully`,
+            message: `Sent ${sentCount} reminder(s) successfully`,
         });
 
     } catch (err) {
