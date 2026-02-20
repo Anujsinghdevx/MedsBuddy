@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "framer-motion"
+import { User, HeartHandshake, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PatientView } from "@/components/PatientView/PatientView"
 import { CaretakerView } from "@/components/Caretaker/CaretakerView"
-import { motion } from "framer-motion"
-import { User, HeartHandshake, ArrowLeft } from "lucide-react"
 
 export default function DashboardPage() {
   const [role, setRole] = useState<"patient" | "caretaker" | null>(null)
