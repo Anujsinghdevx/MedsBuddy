@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { User, HeartHandshake, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PatientView } from "@/components/PatientView/PatientView"
-import { CaretakerView } from "@/components/Caretaker/CaretakerView"
+import { CaretakerView } from "@/components/CareTaker/CaretakerView"
 
 export default function DashboardPage() {
   const [role, setRole] = useState<"patient" | "caretaker" | null>(null)
