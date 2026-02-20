@@ -6,8 +6,7 @@ import { requireServiceAuth } from "@/lib/middleware/auth"
 import { ApiResponse } from "@/lib/api/api-response"
 import { DatabaseError, ExternalServiceError, NotFoundError, ValidationError } from "@/lib/errors"
 
-
-const GRACE_PERIOD_MINUTES = 30 
+const GRACE_PERIOD_MINUTES = 30
 
 async function handler(req: NextRequest, context?: { params: Promise<Record<string, string>> }) {
   const { id: logId } = await context!.params
@@ -31,25 +30,20 @@ async function handler(req: NextRequest, context?: { params: Promise<Record<stri
 
   const now = new Date()
   const scheduledTime = new Date(logData.scheduled_at)
-  
+
   // Calculate time difference in minutes
   const diffMinutes = (now.getTime() - scheduledTime.getTime()) / (1000 * 60)
-  
+
   if (diffMinutes < -GRACE_PERIOD_MINUTES) {
     const hoursUntil = Math.abs(Math.floor(diffMinutes / 60))
     const minutesUntil = Math.abs(Math.floor(diffMinutes % 60))
-    
-    throw new ValidationError(
-      "Cannot mark medication as taken before scheduled time",
-      {
-        scheduled_at: scheduledTime.toISOString(),
-        current_time: now.toISOString(),
-        time_until_scheduled: hoursUntil > 0 
-          ? `${hoursUntil}h ${minutesUntil}m`
-          : `${minutesUntil}m`,
-        grace_period_minutes: GRACE_PERIOD_MINUTES
-      }
-    )
+
+    throw new ValidationError("Cannot mark medication as taken before scheduled time", {
+      scheduled_at: scheduledTime.toISOString(),
+      current_time: now.toISOString(),
+      time_until_scheduled: hoursUntil > 0 ? `${hoursUntil}h ${minutesUntil}m` : `${minutesUntil}m`,
+      grace_period_minutes: GRACE_PERIOD_MINUTES,
+    })
   }
 
   if (logData.status === "taken") {

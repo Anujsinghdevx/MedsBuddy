@@ -5,10 +5,10 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().startsWith("https://"),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  
+
   // Email
   SENDGRID_API_KEY: z.string().min(1),
-  
+
   // Optional
   CRON_SECRET: z.string().optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -31,8 +31,8 @@ export function validateEnv(): Env {
       const missingVars = error.issues.map((err) => err.path.join(".")).join(", ")
       throw new Error(
         `❌ Invalid environment variables: ${missingVars}\n\n` +
-        `Please check your .env.local file and ensure all required variables are set.\n` +
-        `See .env.example for reference.`
+          `Please check your .env.local file and ensure all required variables are set.\n` +
+          `See .env.example for reference.`
       )
     }
     throw error

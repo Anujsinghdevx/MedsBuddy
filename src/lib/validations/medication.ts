@@ -29,7 +29,7 @@ export const medicationSchema = z
     time: z
       .array(z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:MM format"))
       .min(1, "At least one time is required"),
-    
+
     user_timezone_offset: z.number().optional(),
   })
   .superRefine((data, ctx) => {

@@ -1,30 +1,30 @@
 /**
  * Rate Limiting Middleware
- * 
+ *
  * Protects API endpoints from abuse by limiting requests per IP address.
  * Uses in-memory storage with automatic cleanup of expired entries.
- * 
+ *
  * Features:
  * - Per-IP + per-path tracking (prevents cross-endpoint abuse)
  * - Configurable time windows and request limits
  * - Standard HTTP 429 responses with Retry-After headers
  * - Automatic cleanup of expired entries
- * 
+ *
  * ⚠️ IMPORTANT: In-memory store only works for single-server deployments.
  * For production with multiple servers, use Redis or similar distributed store.
- * 
+ *
  * @module rate-limit
  * @see https://tools.ietf.org/html/rfc6585#section-4 - HTTP 429 Too Many Requests
- * 
+ *
  * @example Basic usage
  * ```typescript
  * // In your API route
  * const limiter = rateLimit({ interval: 60000, maxRequests: 10 })
- * 
+ *
  * export async function POST(req: NextRequest) {
  *   const limitResponse = limiter(req)
  *   if (limitResponse) return limitResponse  // Rate limited!
- *   
+ *
  *   // Process request normally
  * }
  * ```
@@ -34,23 +34,23 @@ import { NextRequest, NextResponse } from "next/server"
 
 /**
  * Rate limit tracking data for a specific IP + path combination
- * 
+ *
  * @internal
  */
 interface RateLimitStore {
   /** Number of requests made in current window */
   count: number
-  
+
   /** Timestamp when the rate limit window resets (ms since epoch) */
   resetTime: number
 }
 
 /**
  * In-memory store for rate limit data
- * 
+ *
  * Key format: `{ip}-{path}` (e.g., "192.168.1.1-/api/medication/create")
  * This prevents users from bypassing limits by hitting different endpoints.
- * 
+ *
  * @internal
  */
 const rateLimitStore = new Map<string, RateLimitStore>()
@@ -61,18 +61,18 @@ const rateLimitStore = new Map<string, RateLimitStore>()
 export interface RateLimitConfig {
   /** Time window in milliseconds (default: 60000 = 1 minute) */
   interval: number
-  
+
   /** Maximum requests allowed per interval (default: 60) */
   maxRequests: number
 }
 
 /**
  * Default rate limit configuration
- * 
+ *
  * Conservative defaults suitable for most endpoints:
  * - 60 requests per minute
  * - 1 request per second average
- * 
+ *
  * Override these for specific endpoints (e.g., stricter for sensitive operations)
  */
 const defaultConfig: RateLimitConfig = {
@@ -82,34 +82,34 @@ const defaultConfig: RateLimitConfig = {
 
 /**
  * Creates a rate limiter middleware with custom configuration
- * 
+ *
  * Returns a function that checks if a request should be rate limited.
  * Call this function before processing the request.
- * 
+ *
  * How it works:
  * 1. Extracts client IP from request headers
  * 2. Creates unique key from IP + pathname
  * 3. Checks request count against limit
  * 4. Returns 429 if limit exceeded, null otherwise
- * 
+ *
  * @param config - Partial rate limit configuration (merged with defaults)
  * @returns Middleware function that returns NextResponse if rate limited, null otherwise
- * 
+ *
  * @example Strict rate limiting for sensitive endpoint
  * ```typescript
  * const strictLimiter = rateLimit({
  *   interval: 60 * 1000,  // 1 minute
  *   maxRequests: 5        // Only 5 requests per minute
  * })
- * 
+ *
  * export async function POST(req: NextRequest) {
  *   const limitResponse = strictLimiter(req)
  *   if (limitResponse) return limitResponse
- *   
+ *
  *   // Process sensitive operation
  * }
  * ```
- * 
+ *
  * @example Relaxed rate limiting for public endpoint
  * ```typescript
  * const relaxedLimiter = rateLimit({
@@ -124,7 +124,7 @@ export function rateLimit(config: Partial<RateLimitConfig> = {}) {
 
   /**
    * Middleware function that checks rate limit
-   * 
+   *
    * @param req - Next.js request object
    * @returns NextResponse with 429 status if rate limited, null if allowed
    */
@@ -140,7 +140,7 @@ export function rateLimit(config: Partial<RateLimitConfig> = {}) {
       "unknown"
 
     const now = Date.now()
-    
+
     // Create unique key: IP + path combination
     // This prevents users from bypassing limits by hitting different endpoints
     const key = `${ip}-${req.nextUrl.pathname}`
@@ -195,25 +195,28 @@ export function rateLimit(config: Partial<RateLimitConfig> = {}) {
 // ==================== Automatic Cleanup ====================
 /**
  * Periodically clean up expired rate limit entries
- * 
+ *
  * Runs every 10 minutes to prevent memory leaks.
  * Only runs server-side (not in browser/build).
- * 
+ *
  * Without cleanup, the Map would grow indefinitely as new IPs are seen.
  * This is especially important for public APIs with many users.
  */
 if (typeof window === "undefined") {
-  setInterval(() => {
-    const now = Date.now()
-    
-    // Remove all expired entries
-    for (const [key, entry] of rateLimitStore.entries()) {
-      if (now > entry.resetTime) {
-        rateLimitStore.delete(key)
+  setInterval(
+    () => {
+      const now = Date.now()
+
+      // Remove all expired entries
+      for (const [key, entry] of rateLimitStore.entries()) {
+        if (now > entry.resetTime) {
+          rateLimitStore.delete(key)
+        }
       }
-    }
-    
-    // Optional: Log cleanup stats for monitoring
-    // console.log(`Rate limit cleanup: ${deletedCount} entries removed`)
-  }, 10 * 60 * 1000) // Every 10 minutes
+
+      // Optional: Log cleanup stats for monitoring
+      // console.log(`Rate limit cleanup: ${deletedCount} entries removed`)
+    },
+    10 * 60 * 1000
+  ) // Every 10 minutes
 }

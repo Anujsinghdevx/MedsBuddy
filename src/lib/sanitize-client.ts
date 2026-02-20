@@ -18,13 +18,13 @@ export function sanitizeHtmlClient(html: string): string {
  */
 export function sanitizeTextClient(text: string): string {
   if (!text) return ""
-  
+
   // Remove null bytes and control characters
   let cleaned = text.replace(/[\0\x00-\x1F\x7F]/g, "")
-  
+
   // Trim whitespace
   cleaned = cleaned.trim()
-  
+
   // Basic HTML entity escape
   cleaned = cleaned
     .replace(/&/g, "&amp;")
@@ -32,7 +32,7 @@ export function sanitizeTextClient(text: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;")
-  
+
   return cleaned
 }
 
@@ -41,7 +41,7 @@ export function sanitizeTextClient(text: string): string {
  */
 export function sanitizeMedicationNameClient(name: string): string {
   if (!name) return ""
-  
+
   return name
     .trim()
     .replace(/[^a-zA-Z0-9\s\-\(\)\/]/g, "")
@@ -53,7 +53,7 @@ export function sanitizeMedicationNameClient(name: string): string {
  */
 export function sanitizeDosageClient(dosage: string): string {
   if (!dosage) return ""
-  
+
   return dosage
     .trim()
     .replace(/[^a-zA-Z0-9\s\.\/]/g, "")

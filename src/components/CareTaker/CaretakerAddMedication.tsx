@@ -55,7 +55,7 @@ export default function CaretakerAddMedicationForm() {
   const onSubmit = (values: MedicationFormValues) => {
     const enrichedValues = {
       ...values,
-      user_timezone_offset: new Date().getTimezoneOffset()
+      user_timezone_offset: new Date().getTimezoneOffset(),
     }
     mutation.mutate(enrichedValues)
   }

@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization")
     const cronSecret = process.env.CRON_SECRET
-    
+
     if (!cronSecret) {
       console.error("CRON_SECRET not configured")
       return NextResponse.json(
@@ -27,30 +27,30 @@ export async function GET(req: NextRequest) {
           success: false,
           error: {
             code: "CONFIGURATION_ERROR",
-            message: "Server configuration error"
-          }
+            message: "Server configuration error",
+          },
         },
         { status: 500 }
       )
     }
-    
+
     if (authHeader !== `Bearer ${cronSecret}`) {
       console.warn("Unauthorized CRON access attempt", {
         ip: req.headers.get("x-forwarded-for"),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
       return NextResponse.json(
         {
           success: false,
           error: {
             code: "UNAUTHORIZED",
-            message: "Unauthorized"
-          }
+            message: "Unauthorized",
+          },
         },
         { status: 401 }
       )
     }
-    
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!

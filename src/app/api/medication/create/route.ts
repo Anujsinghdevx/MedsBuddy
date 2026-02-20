@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     // Sanitize and validate input
     const sanitizedBody = sanitizeMedicationInput(rawBody)
-    
+
     if (!sanitizedBody) {
       throw new ValidationError("Invalid medication data provided", {
         hint: "Please check name, time array, and duration_days",
@@ -71,32 +71,32 @@ export async function POST(req: NextRequest) {
 
     // Get today's date
     const today = new Date()
-    
+
     const logs = []
 
     for (let day = 0; day < medication.duration_days; day++) {
       // Calculate the scheduled date
       const scheduledDate = new Date(today)
       scheduledDate.setDate(scheduledDate.getDate() + day)
-      
+
       // Format as YYYY-MM-DD for scheduled_for field
       const year = scheduledDate.getFullYear()
-      const month = String(scheduledDate.getMonth() + 1).padStart(2, '0')
-      const dayOfMonth = String(scheduledDate.getDate()).padStart(2, '0')
+      const month = String(scheduledDate.getMonth() + 1).padStart(2, "0")
+      const dayOfMonth = String(scheduledDate.getDate()).padStart(2, "0")
       const formattedDate = `${year}-${month}-${dayOfMonth}`
 
       for (const time of medication.time) {
         // Parse the time (HH:MM format) - this is in user's local time
-        const [hours, minutes] = time.split(':').map(Number)
+        const [hours, minutes] = time.split(":").map(Number)
         const scheduledDateTime = new Date(scheduledDate)
         scheduledDateTime.setHours(0, 0, 0, 0)
-        
+
         // Add the user's specified time
         scheduledDateTime.setHours(hours, minutes)
         const serverOffset = scheduledDateTime.getTimezoneOffset()
         const offsetDifference = serverOffset - user_timezone_offset
         scheduledDateTime.setMinutes(scheduledDateTime.getMinutes() + offsetDifference)
-        
+
         logs.push({
           medication_id: medication.id,
           user_id: user.id,
