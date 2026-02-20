@@ -2,8 +2,14 @@ import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { AuthenticationError, DatabaseError, ValidationError } from "@/lib/errors"
+import { rateLimit } from "@/lib/middleware/rate-limit"
+import { sanitizeMedicationInput } from "@/lib/sanitize"
 
 export async function POST(req: NextRequest) {
+  // Rate limiting: 10 medication creations per minute
+  const rateLimitResult = rateLimit({ maxRequests: 10, interval: 60000 })(req)
+  if (rateLimitResult) return rateLimitResult
+
   try {
     const cookieStore = await cookies()
 
@@ -33,18 +39,21 @@ export async function POST(req: NextRequest) {
       throw new AuthenticationError("Authentication required")
     }
 
-    const body = await req.json()
+    const rawBody = await req.json()
 
-    if (!body.name || !body.time || !body.duration_days) {
-      throw new ValidationError("Missing required fields", {
-        required: ["name", "time", "duration_days"],
+    // Sanitize and validate input
+    const sanitizedBody = sanitizeMedicationInput(rawBody)
+    
+    if (!sanitizedBody) {
+      throw new ValidationError("Invalid medication data provided", {
+        hint: "Please check name, time array, and duration_days",
       })
     }
 
     const { data: medication, error } = await supabase
       .from("medications")
       .insert({
-        ...body,
+        ...sanitizedBody,
         user_id: user.id,
       })
       .select()
