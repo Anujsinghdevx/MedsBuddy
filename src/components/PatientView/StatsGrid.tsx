@@ -1,7 +1,8 @@
 "use client"
 
 import { MedicationStats } from "@/types/supabase"
-import { Flame, CheckCircle2, TrendingUp } from "lucide-react"
+import { Flame, CheckCircle2, TrendingUp, LucideProps } from "lucide-react"
+import React from "react"
 
 interface StatsGridProps {
   stats: MedicationStats
@@ -41,7 +42,7 @@ interface StatCardProps {
   title: string
   value: string | number
   description: string
-  icon: any
+  icon: React.ComponentType<LucideProps>
   accent: string
 }
 

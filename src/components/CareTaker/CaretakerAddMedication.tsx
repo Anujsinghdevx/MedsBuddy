@@ -52,7 +52,13 @@ export default function CaretakerAddMedicationForm() {
     onError: (error: Error) => toast.error(error?.message || "Failed to add medication"),
   })
 
-  const onSubmit = (values: MedicationFormValues) => mutation.mutate(values)
+  const onSubmit = (values: MedicationFormValues) => {
+    const enrichedValues = {
+      ...values,
+      user_timezone_offset: new Date().getTimezoneOffset()
+    }
+    mutation.mutate(enrichedValues)
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-xl bg-white p-6 shadow-md">

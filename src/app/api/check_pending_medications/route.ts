@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js"
 import sgMail from "@sendgrid/mail"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { DatabaseError, ExternalServiceError } from "@/lib/errors"
 
 type ReminderLog = {
@@ -15,8 +15,42 @@ type ReminderLog = {
   }[]
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization")
+    const cronSecret = process.env.CRON_SECRET
+    
+    if (!cronSecret) {
+      console.error("CRON_SECRET not configured")
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "CONFIGURATION_ERROR",
+            message: "Server configuration error"
+          }
+        },
+        { status: 500 }
+      )
+    }
+    
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      console.warn("Unauthorized CRON access attempt", {
+        ip: req.headers.get("x-forwarded-for"),
+        timestamp: new Date().toISOString()
+      })
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Unauthorized"
+          }
+        },
+        { status: 401 }
+      )
+    }
+    
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!

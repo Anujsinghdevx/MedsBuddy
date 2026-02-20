@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
 
     const rawBody = await req.json()
 
+    // Extract timezone offset before sanitization
+    const user_timezone_offset = rawBody.user_timezone_offset ?? new Date().getTimezoneOffset()
+
     // Sanitize and validate input
     const sanitizedBody = sanitizeMedicationInput(rawBody)
     
@@ -66,20 +69,40 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const today = new Date().toISOString().split("T")[0]
+    // Get today's date
+    const today = new Date()
+    
     const logs = []
 
     for (let day = 0; day < medication.duration_days; day++) {
+      // Calculate the scheduled date
       const scheduledDate = new Date(today)
       scheduledDate.setDate(scheduledDate.getDate() + day)
-      const formattedDate = scheduledDate.toISOString().split("T")[0]
+      
+      // Format as YYYY-MM-DD for scheduled_for field
+      const year = scheduledDate.getFullYear()
+      const month = String(scheduledDate.getMonth() + 1).padStart(2, '0')
+      const dayOfMonth = String(scheduledDate.getDate()).padStart(2, '0')
+      const formattedDate = `${year}-${month}-${dayOfMonth}`
 
       for (const time of medication.time) {
+        // Parse the time (HH:MM format) - this is in user's local time
+        const [hours, minutes] = time.split(':').map(Number)
+        const scheduledDateTime = new Date(scheduledDate)
+        scheduledDateTime.setHours(0, 0, 0, 0)
+        
+        // Add the user's specified time
+        scheduledDateTime.setHours(hours, minutes)
+        const serverOffset = scheduledDateTime.getTimezoneOffset()
+        const offsetDifference = serverOffset - user_timezone_offset
+        scheduledDateTime.setMinutes(scheduledDateTime.getMinutes() + offsetDifference)
+        
         logs.push({
           medication_id: medication.id,
           user_id: user.id,
           scheduled_for: formattedDate,
-          scheduled_at: `${formattedDate}T${time}:00`,
+          // Store as ISO string - this will be in UTC but correctly represents user's local time
+          scheduled_at: scheduledDateTime.toISOString(),
           status: "pending",
         })
       }
