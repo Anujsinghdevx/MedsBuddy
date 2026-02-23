@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 const ALLOWED_ORIGINS = [
   process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  "https://your-production-domain.com", // Replace with your actual domain
+  "https://meds-buddy-sigma.vercel.app/",
 ]
 
 export function corsHeaders(origin: string | null): HeadersInit {
@@ -13,14 +13,13 @@ export function corsHeaders(origin: string | null): HeadersInit {
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Max-Age": "86400", // 24 hours
+    "Access-Control-Max-Age": "86400", 
   }
 }
 
 export function handleCors(req: NextRequest): NextResponse | null {
   const origin = req.headers.get("origin")
 
-  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return new NextResponse(null, {
       status: 204,
@@ -28,7 +27,6 @@ export function handleCors(req: NextRequest): NextResponse | null {
     })
   }
 
-  // Return null to continue processing (CORS headers will be added to response)
   return null
 }
 
